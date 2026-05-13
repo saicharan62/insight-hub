@@ -1,215 +1,235 @@
-InsightHub - A Minimal AI-Powered Personal Knowledge Engine
+# InsightHub
 
-🚀 Overview
+> **Turn raw notes into structured knowledge — automatically.**
 
-InsightHub is a lightweight, full-stack AI system that transforms user notes into structured insights.
+InsightHub is a lightweight, full-stack AI system that processes your notes and surfaces what actually matters: key points, action items, open questions, tone, and tags. It also clusters semantically related insights so you can discover connections across your own thinking over time.
 
-It performs:
-Automatic NLP processing – summary, sentiment, keywords
-Vector embedding \& clustering of insights
-AI-assisted insight extraction (key points, action items, questions, tone)
-Clean frontend built with React + Tailwind
-Secure API using FastAPI + PostgreSQL + JWT Auth
-The system is designed to serve as a personal knowledge base, research assistant, and insight generator, all in one minimal interface.
+---
 
-🧠 Core Features
-🔐 Authentication
-JWT-based secure login \& registration
-Protected Insight endpoints
+## Table of Contents
 
-📝 Insight Engine
-Create, update, delete personal insights
-Automatic summary, keyword extraction \& sentiment via transformers
-AI-driven “Insight Extraction” with:
-Key points
-Action items
-Questions
-Tone
-Tags
+- [The Problem](#the-problem)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Repository Structure](#repository-structure)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Example Response](#example-response)
+- [Roadmap](#roadmap)
+- [License](#license)
 
-🧬 Semantic Clustering
-SentenceTransformer embeddings
-Incremental similarity-based cluster formation
-“Cluster View” to see related thoughts grouped together
+---
 
-💡 Frontend (React + Tailwind)
-Single-page interface
-Create \& view insights
-Extract insights from any note
-View semantic clusters
-Minimal clean UI (Apple-style aesthetic)
+## The Problem
 
+Notes accumulate faster than they can be reviewed. A meeting note, a news article, a half-formed idea — they pile up as unstructured text with no summary, no tags, no way to see which thoughts are related. Extracting value from a personal knowledge base is a manual chore.
 
+InsightHub automates that extraction. Write a note, hit save, and the system immediately produces a summary, sentiment, keywords, and a structured insight breakdown. Over time, similar notes get clustered together, revealing patterns and connections you wouldn't have spotted manually.
 
-🏗️ Tech Stack
+---
 
-Layer	Technology
+## Features
 
-Backend	FastAPI, SQLAlchemy, Pydantic
+**Authentication**
+- JWT-based registration and login
+- All insight endpoints are protected
 
-NLP	HuggingFace Transformers, KeyBERT
+**Insight Engine**
+- Create, read, update, and delete personal insights
+- Automatic NLP processing on every save: summary, keyword extraction, and sentiment analysis via HuggingFace Transformers and KeyBERT
+- AI-driven structured extraction returning key points, action items, open questions, tone, and tags
 
-Embeddings	SentenceTransformer (MiniLM-L6-v2)
+**Semantic Clustering**
+- Each insight is embedded using SentenceTransformer (`all-MiniLM-L6-v2`)
+- Insights are incrementally grouped by similarity into clusters
+- A dedicated Cluster View surfaces related thoughts side by side
 
-DB	PostgreSQL
+**Frontend**
+- Single-page React + Tailwind interface
+- Create and browse insights
+- Trigger structured extraction on any note
+- View semantic clusters
+- Minimal, clean aesthetic
 
-Auth	JWT
+---
 
-Frontend	React + Vite + TailwindCSS
+## Tech Stack
 
-Infra	Docker-ready
+| Layer | Technology |
+|---|---|
+| Backend | FastAPI, SQLAlchemy, Pydantic |
+| NLP | HuggingFace Transformers, KeyBERT |
+| Embeddings | SentenceTransformer (`all-MiniLM-L6-v2`) |
+| Database | PostgreSQL |
+| Auth | JWT |
+| Frontend | React, Vite, TailwindCSS |
+| Infra | Docker-ready |
 
-📂 Repository Structure
+---
 
+## Repository Structure
+
+```
 insight-hub/
-
-│
-
 ├── backend/
-
 │   ├── app/
-
-│   │   ├── main.py
-
-│   │   ├── core/ (NLP, embedding, auth)
-
-│   │   ├── routes/ (insights, auth, extract)
-
-│   │   ├── models/ (Insight, InsightEmbedding, User)
-
-│   │   ├── schemas/
-
-│   │   └── db.py
-
-│
-
+│   │   ├── main.py              # FastAPI application entry point
+│   │   ├── db.py                # Database session and connection
+│   │   ├── core/
+│   │   │   ├── nlp.py           # Summary, sentiment, keyword extraction
+│   │   │   ├── embeddings.py    # SentenceTransformer embedding logic
+│   │   │   └── auth.py          # JWT utilities
+│   │   ├── routes/
+│   │   │   ├── insights.py      # CRUD endpoints
+│   │   │   ├── extract.py       # Structured AI extraction endpoint
+│   │   │   └── auth.py          # Register / login endpoints
+│   │   ├── models/              # SQLAlchemy models (User, Insight, InsightEmbedding)
+│   │   └── schemas/             # Pydantic request/response schemas
 ├── insighthub-ui/
-
 │   ├── src/
-
-│   │   ├── InsightHubApp.tsx
-
+│   │   ├── InsightHubApp.tsx    # Root application component
 │   │   └── ...
-
 │   └── index.html
-
-│
-
+├── requirements.txt
 └── README.md
+```
 
+---
 
+## Prerequisites
 
-⚙️ Setup Instructions
+- Python ≥ 3.10
+- Node.js ≥ 18
+- PostgreSQL (running and accessible)
+- (Optional) Docker, for containerised deployment
 
-1️⃣ Backend Setup
+---
 
+## Setup
+
+### Backend
+
+**1. Install Python dependencies**
+
+```bash
 cd backend
-
 pip install -r requirements.txt
+```
 
-uvicorn app.main:app --reload
+**2. Configure environment variables**
 
+Create a `.env` file in the `backend/` directory (see [Environment Variables](#environment-variables) below).
 
+**3. Run database migrations**
 
-
-
-You must set environment variables:
-
-
-
-DATABASE\_URL=postgresql://user:pass@localhost/insighthub
-
-JWT\_SECRET=your\_secret
-
-
-
-2️⃣ DB Migration
-
+```bash
 alembic upgrade head
+```
 
+**4. Start the API server**
 
+```bash
+uvicorn app.main:app --reload
+```
 
-3️⃣ Frontend Setup
+The API will be available at `http://localhost:8000`. Interactive docs are at `http://localhost:8000/docs`.
 
+---
+
+### Frontend
+
+**1. Install dependencies**
+
+```bash
 cd insighthub-ui
-
 npm install
+```
 
+**2. Start the development server**
+
+```bash
 npm run dev
+```
 
+The UI will be available at `http://localhost:5173`.
 
+If the backend is running on a different host or port, set the API base URL before the app loads:
 
+```javascript
+window.__INSIGHTHUB_API_BASE__ = "http://<host>:8000";
+```
 
+---
 
-If backend runs on another host/port, set:
+## Environment Variables
 
+| Variable | Description | Example |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@localhost/insighthub` |
+| `JWT_SECRET` | Secret key for signing JWT tokens | `a-long-random-string` |
 
+---
 
-window.\_\_INSIGHTHUB\_API\_BASE\_\_ = "http://<host>:8000"
+## API Reference
 
+### Auth
 
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Create a new user account |
+| `POST` | `/auth/login` | Authenticate and receive a JWT |
 
-🔑 API Highlights
+### Insights
 
-Endpoint	Method	Description
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/insights/` | Create a new insight (triggers NLP processing) |
+| `GET` | `/insights/` | List all insights for the authenticated user |
+| `PATCH` | `/insights/{id}` | Update an existing insight |
+| `DELETE` | `/insights/{id}` | Delete an insight |
 
-/auth/register	POST	Create user
+### Extraction & Clustering
 
-/auth/login	POST	Get JWT
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/insights/{id}/extract` | Run structured AI extraction on a single insight |
+| `GET` | `/insights/clusters` | Return all insights grouped by semantic similarity |
 
-/insights/	POST	Create insight
+All endpoints except `/auth/register` and `/auth/login` require an `Authorization: Bearer <token>` header.
 
-/insights/	GET	Get all insights
+---
 
-/insights/{id}	PATCH	Update insight
+## Example Response
 
-/insights/{id}	DELETE	Delete insight
+`GET /insights/{id}/extract`
 
-/insights/{id}/extract	GET	Extract structured insight
-
-/insights/clusters	GET	Get semantic clusters
-
-🧪 Example Extract Response
-
+```json
 {
-
-&nbsp; "key\_points": \["Pakistan initiated drone retaliation..."],
-
-&nbsp; "action\_items": \[],
-
-&nbsp; "tone": "neutral / observational",
-
-&nbsp; "questions": \[],
-
-&nbsp; "tags": \["drone","defence","iccs"]
-
+  "key_points": [
+    "Pakistan initiated drone retaliation across the eastern border"
+  ],
+  "action_items": [],
+  "tone": "neutral / observational",
+  "questions": [],
+  "tags": ["drone", "defence", "geopolitics"]
 }
+```
 
+---
 
+## Roadmap
 
-🏁 Roadmap
+- [ ] Full CRUD actions in the UI (edit and delete)
+- [ ] Global search and tag-based filtering
+- [ ] VectorDB backend (Qdrant / Weaviate) for scalable similarity search
+- [ ] Conversational AI interface trained on the user's own insights
 
+---
 
+## License
 
-🔄 Full CRUD in UI (update + delete)
-
-
-
-🔍 Global search \& filters
-
-
-
-🧭 VectorDB support
-
-
-
-🧑‍💻 AI chatbot trained on user’s insights
-
-
-
-📜 License
-
-
-
-MIT (Open use allowed)
-
+MIT © [saicharan62](https://github.com/saicharan62)
